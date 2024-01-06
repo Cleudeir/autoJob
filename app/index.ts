@@ -1,10 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
-import { apiKey } from "./.env";
-import { requestGPT } from "./app/requestGPT";
+
+import { replaceContentInFile } from "./replaceContentInFile";
 const directory = "/home/user/Documents/teste_Supermercado";
 const directoryPath = directory + "/src";
-const localPath = __dirname.replace("dist", "");
+const localPath = __dirname.replace("app", "");
 
 fs.copyFile(
   directory + "/package.json",
@@ -35,11 +35,12 @@ function readFilesInDirectory(directoryPath: string): void {
         }
         if (stats.isFile()) {
           // console.log("File:", filePath);
-          if (filePath.includes(".ts") || filePath.includes(".js"))
-            //replaceContentInFile(filePath);
-            pathsProject.push({
-              [String(pathsProject.length)]: filePath.replace(directory, ""),
-            });
+          if (filePath.includes(".ts") || filePath.includes(".js")) {
+            moveFiles(filePath);
+          }
+          pathsProject.push({
+            [String(pathsProject.length)]: filePath.replace(directory, ""),
+          });
           fs.writeFile(
             localPath + "/output/paths.json",
             JSON.stringify(pathsProject),
@@ -49,11 +50,11 @@ function readFilesInDirectory(directoryPath: string): void {
                 console.error("Error writing file:", writeErr);
                 return;
               }
-              //console.log("Content replaced in", directoryPath);
+              console.log("Content replaced in", directoryPath);
             }
           );
         } else if (stats.isDirectory()) {
-          // console.log("Directory:", filePath);
+          console.log("Directory:", filePath);
           readFilesInDirectory(filePath);
         }
       });
@@ -61,35 +62,26 @@ function readFilesInDirectory(directoryPath: string): void {
   });
 }
 
-function replaceContentInFile(filePath: string): void {
-  fs.readFile(filePath, "utf-8", (readErr, data) => {
+function moveFiles(filePath: string): void {
+  console.log("filePath: ", filePath);
+  fs.readFile(filePath, "utf-8", async (readErr, data) => {
     if (readErr) {
       console.error("Error reading file:", readErr);
       return;
     }
-
-    let replacedContent = data;
     const file = filePath.replace(directory, localPath + "output");
     const dir = file.split("/").slice(0, -1).join("/");
 
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    fs.writeFile(file, replacedContent, "utf-8", (writeErr) => {
+    fs.writeFile(file, data, "utf-8", (writeErr) => {
       if (writeErr) {
         console.error("Error writing file:", writeErr);
         return;
       }
-      console.log("Content replaced in", filePath);
     });
   });
 }
 
-const prompt = "make a joke";
-requestGPT({ prompt, apiKey })
-  .then((response) => {
-    console.log(response);
-  })
-  .catch((error) => {
-    // Handle errors
-  });
+replaceContentInFile();

@@ -18,18 +18,22 @@ export const requestGPT = async ({
 }: Props) => {
   const openai = new OpenAI({
     apiKey: apiKey,
-    //baseURL: "http://localhost:1234/v1",
+    baseURL: "http://localhost:1234/v1",
   });
 
   const chatCompletion = await openai.chat.completions.create({
     model: `gpt-3.5-turbo`,
     messages: [
-      { role: "system", content: "Always answer in rhymes." },
+      {
+        role: "system",
+        content: "you are best programming development assistant",
+      },
       { role: "user", content: `${prompt}` },
     ],
   });
 
-  const result = chatCompletion.choices[0].message;
+  const result = chatCompletion.choices[0].message as any;
+  console.log("result: ", result);
 
   return result;
 };

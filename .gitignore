@@ -1,4 +1,10 @@
 /node_modules
+/dist
+/mysql
+.env
+/build
+
+/node_modules
 .env.ts
 /dist/*
 /output/*
