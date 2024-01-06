@@ -1,42 +1,57 @@
 import * as fs from "fs";
 import * as path from "path";
+import { apiKey } from "../.env";
+import { requestGPT } from "./requestGPT";
 
-const filePath = "/home/user/Documents/teste_Supermercado/output/paths.json";
-const localPath = __dirname.replace("dist", "");
+const filePath = path.resolve("./input/paths.json");
+console.log("filePath: ", filePath);
 
-export function replaceContentInFile(): void {
+const localPathInput = __dirname.replace("app", "input");
+const localPathOut = __dirname.replace("app", "output");
+
+export function replaceContentInFile(index: number): void {
   fs.readFile(filePath, "utf-8", async (readErr, data) => {
     if (readErr) {
       console.error("Error reading file:", readErr);
       return;
     }
-    console.log("data: ", data);
 
-    /*
-    const prompt = `replace ${filePath} with: response only code with the same structure, otimize code : ${data}`;
+    const parseData = JSON.parse(data);
+    const itemInputData = localPathInput + parseData[index];
+    const itemOutData = localPathOut + parseData[index];
 
-    const response = await requestGPT({ prompt, apiKey });
-    console.log(response);
+    console.log("data: ", localPathInput + itemInputData);
+    if (itemInputData.includes(".ts") || itemInputData.includes(".js")) {
+      fs.readFile(itemInputData, "utf-8", async (readErr, item) => {
+        if (readErr) {
+          console.error("Error reading file:", readErr);
+          return replaceContentInFile(index + 1);
+        }
+        console.log(item);
 
-    const file = filePath.replace(directory, localPath + "output");
-    const dir = file.split("/").slice(0, -1).join("/");
+        const prompt = `replace ${filePath} with: response only code with the same structure, otimize code : ${parseData}`;
+        try {
+          const response = await requestGPT({ prompt, apiKey });
+          console.log(response);
 
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+          fs.writeFile(
+            itemOutData,
+            JSON.stringify(response),
+            "utf-8",
+            (writeErr) => {
+              if (writeErr) {
+                console.error("Error writing file:", writeErr);
+              }
+              console.log("Content replaced in", index + 1);
+              return replaceContentInFile(index + 1);
+            }
+          );
+        } catch (error) {
+          console.error("error: ", error);
+        }
+      });
+    } else {
+      return replaceContentInFile(index + 1);
     }
-    fs.writeFile(file, data, "utf-8", (writeErr) => {
-      if (writeErr) {
-        console.error("Error writing file:", writeErr);
-        return;
-      }
-    });
-    fs.writeFile(file + "modified", response, "utf-8", (writeErr) => {
-      if (writeErr) {
-        console.error("Error writing file:", writeErr);
-        return;
-      }
-      console.log("Content replaced in", filePath);
-    });
-    */
   });
 }

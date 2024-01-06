@@ -1,5 +1,4 @@
 import OpenAI from "openai";
-import { apiKey } from "../.env";
 
 type Props = {
   prompt: string;
