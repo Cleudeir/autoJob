@@ -6,6 +6,13 @@ const directory = "/home/user/Documents/teste_Supermercado";
 const directoryPath = directory + "/src";
 const localPath = __dirname.replace("app", "");
 
+if (!fs.existsSync(localPath + "/output/")) {
+  fs.mkdirSync(localPath + "/output/", { recursive: true });
+}
+if (!fs.existsSync(localPath + "/input/")) {
+  fs.mkdirSync(localPath + "/input/", { recursive: true });
+}
+
 fs.copyFile(
   directory + "/package.json",
   localPath + "/input/package.json",
@@ -36,13 +43,13 @@ async function readFilesInDirectory(directoryPath: string): Promise<void> {
         if (stats.isFile()) {
           if (filePath.includes(".ts") || filePath.includes(".js")) {
             moveFiles(filePath);
+            pathsProject.push(filePath.replace(directory, ""));
+            await fs.writeFileSync(
+              localPath + "/input/paths.json",
+              JSON.stringify(pathsProject),
+              "utf-8"
+            );
           }
-          pathsProject.push(filePath.replace(directory, ""));
-          await fs.writeFileSync(
-            localPath + "/input/paths.json",
-            JSON.stringify(pathsProject),
-            "utf-8"
-          );
         } else if (stats.isDirectory()) {
           readFilesInDirectory(filePath);
         }
@@ -53,7 +60,6 @@ async function readFilesInDirectory(directoryPath: string): Promise<void> {
 
 function moveFiles(filePath: string): void {
   fs.readFile(filePath, "utf-8", async (readErr, data) => {
-    console.log("filePath: ", filePath);
     if (readErr) {
       console.error("Error reading file:", readErr);
       return;

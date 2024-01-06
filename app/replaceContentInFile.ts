@@ -27,25 +27,19 @@ export function replaceContentInFile(index: number): void {
           console.error("Error reading file:", readErr);
           return replaceContentInFile(index + 1);
         }
-        console.log(item);
 
         const prompt = `replace ${filePath} with: response only code with the same structure, otimize code : ${parseData}`;
         try {
           const response = await requestGPT({ prompt, apiKey });
           console.log(response);
 
-          fs.writeFile(
-            itemOutData,
-            JSON.stringify(response),
-            "utf-8",
-            (writeErr) => {
-              if (writeErr) {
-                console.error("Error writing file:", writeErr);
-              }
-              console.log("Content replaced in", index + 1);
-              return replaceContentInFile(index + 1);
+          fs.writeFile(itemOutData, response, "utf-8", (writeErr) => {
+            if (writeErr) {
+              console.error("Error writing file:", writeErr);
             }
-          );
+            console.log("Content replaced in", index + 1);
+            return replaceContentInFile(index + 1);
+          });
         } catch (error) {
           console.error("error: ", error);
         }

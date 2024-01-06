@@ -20,6 +20,7 @@ export const requestGPT = async ({
     baseURL: "http://localhost:1234/v1",
   });
 
+  console.log("chatCompletion: ");
   const chatCompletion = await openai.chat.completions.create({
     model: `gpt-3.5-turbo`,
     messages: [
@@ -27,12 +28,16 @@ export const requestGPT = async ({
         role: "system",
         content: "you are best programming development assistant",
       },
-      { role: "user", content: `${prompt}` },
+      {
+        role: "user",
+        content: `response my ask with only code, not explain :  ${prompt}`,
+      },
     ],
   });
 
-  const result = chatCompletion.choices[0].message as any;
-  console.log("result: ", result);
+  const [_, result]: any =
+    chatCompletion.choices[0].message.content?.split("```");
+  console.log("result: ", String(result));
 
-  return result;
+  return String(result);
 };
