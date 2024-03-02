@@ -1,43 +1,65 @@
-import OpenAI from "openai";
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 type Props = {
   prompt: string;
   apiKey: string;
-  model?: string;
+  model?:
+    | "llama2"
+    | "gemma:7b"
+    | "deepseek-coder"
+    | "deepseek-coder:6.7b"
+    | "deepseek-coder:33b"
+    | "deepseek-coder:1.3b-base";
   maxTokens?: number;
   temperature?: number;
+  type?: number;
 };
 
 export const requestGPT = async ({
   prompt,
   apiKey,
-  model = "text-davinci-003",
+  model = "llama2",
   maxTokens = 100,
   temperature = 0.7,
-}: Props) => {
-  const openai = new OpenAI({
-    apiKey: apiKey,
-    baseURL: "http://localhost:1234/v1",
-  });
+  type = 0,
+}: Props): Promise<string | null> => {
+  const url = "http://localhost:11434/api/generate";
+  const prompType = [
+    `\nResume this and response-me only in this structure, json format, kardown code:\n`,
+    `\nFix indentation, the code and response-me only in this structure, json format, kardown code:\n`,
+  ];
+  const requestBody1 = {
+    model,
+    prompt: `${prompt}
+    ${prompType[type]}
+    { 
+      name: " ",
+      libs: " ",
+      input: (component inputs with types): " ",
+      output: (component output with types, if return JSX.Element list all tags names and your attributes): " "
+    }
+  `,
+    stream: false,
+  };
 
-  console.log("chatCompletion: ");
-  const chatCompletion = await openai.chat.completions.create({
-    model: `gpt-3.5-turbo`,
-    messages: [
-      {
-        role: "system",
-        content: "you are best programming development assistant",
-      },
-      {
-        role: "user",
-        content: `response my ask with only code, not explain :  ${prompt}`,
-      },
-    ],
-  });
+  try {
+    console.log("start");
+    const time = Date.now();
 
-  const [_, result]: any =
-    chatCompletion.choices[0].message.content?.split("```");
-  console.log("result: ", String(result));
+    const response = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify(requestBody1),
+    });
 
-  return String(result);
+    const result = await response.json();
+    const { response: output } = result;
+
+    console.log("end", Date.now() - time);
+    console.log(result);
+    return output;
+  } catch (error) {
+    console.error("Error fetching response:", error);
+    return null;
+  }
 };
