@@ -18,13 +18,20 @@ type Props = {
 
 export const requestGPT = async ({
   content,
-  model = "llama2",
+  model = "deepseek-coder:6.7b",
   type = 0,
   sever = "ollama",
 }: Props): Promise<string | null> => {
   const prompType = [
-    `this is typescript code, fix types "any", refactory this code, pls write complete code, response complete code, write only code, no comment, no explanation, no other information`,
-    `\nSummarize what this code does, use non-specialist language`,
+    `this code is react native TypeScrept, refactory this code using this instructions:
+    1. Remove code repeat create function to do not repeat code
+    2. Remove all comments
+    3. Retype this code, this is typescript code, fix types "any",
+    4. Rename all variables to portuguese pt-br
+    5. Write complete code
+    6. Response complete code
+    7. write only code, no comment, no explanation, no other information`,
+    `\nSummarize what this code does, to be succinct`,
   ];
 
   if (sever === "ollama") {
@@ -39,7 +46,7 @@ export const requestGPT = async ({
       options: {
         num_batch: 2,
         num_gqa: 1,
-        num_gpu: 24,
+        num_gpu: 16,
         main_gpu: 1,
         num_thread: 4,
       },

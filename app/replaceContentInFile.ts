@@ -10,7 +10,9 @@ export async function replaceContentInFile(
     try {
       const contentRead = await fsPromises.readFile(itemInputData, "utf-8");
       const content = `${contentRead}`;
-
+      const localPathFileName =
+        localPathOut + "/src/" + itemInputData.split("/src/")[1];
+      const localPathDir = localPathFileName.split("/").slice(0, -1).join("/");
       const response = await requestGPT({
         content: content,
         type: 0,
@@ -19,9 +21,7 @@ export async function replaceContentInFile(
       if (!response) return;
 
       //
-      const localPathFileName =
-        localPathOut + "/src/" + itemInputData.split("/src/")[0];
-      const localPathDir = localPathFileName.split("/").slice(0, -1).join("/");
+
       await fsPromises.mkdir(localPathDir, {
         recursive: true,
       });
@@ -29,7 +29,7 @@ export async function replaceContentInFile(
       const contentFilter = response.includes("```")
         ? response.split("```")[1]
         : response;
-      await fsPromises.writeFile(localPathFileName, contentFilter, "utf-8");
+      fsPromises.writeFile(localPathFileName, contentFilter, "utf-8");
 
       const response2 = await requestGPT({
         content: content,
@@ -39,12 +39,9 @@ export async function replaceContentInFile(
       await fsPromises.mkdir(localPathOut, {
         recursive: true,
       });
+      console.log("localPathFileName: ", localPathFileName);
       const _data = `path: ${itemInputData}\n\n${response2}\n\n`;
-      await fsPromises.appendFile(
-        localPathOut + "/summarize.txt",
-        _data,
-        "utf-8"
-      );
+      fsPromises.appendFile(localPathOut + "/summarize.txt", _data, "utf-8");
     } catch (error) {
       console.error("error: ", error);
     }
