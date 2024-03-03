@@ -1,12 +1,9 @@
 import { replaceContentInFile } from "./replaceContentInFile";
 import { exec } from "child_process";
 
-const startModel = async (modelName = "llama2") => {
-  await executeCommand("ollama run --help");
+const startModel = async (modelName = "deepseek-coder") => {
   await executeCommand("ollama list");
-  await executeCommand(`ollama run ${modelName}`, () =>
-    replaceContentInFile(0)
-  );
+  replaceContentInFile(1);
 };
 
 function executeCommand(command: string, callback?: () => void): Promise<void> {
