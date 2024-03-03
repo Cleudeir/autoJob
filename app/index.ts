@@ -1,9 +1,12 @@
+import { readFilesInDirectory } from "./readFiles";
 import { replaceContentInFile } from "./replaceContentInFile";
 import { exec } from "child_process";
 
 const startModel = async (modelName = "deepseek-coder") => {
   await executeCommand("ollama list");
-  replaceContentInFile(1);
+  const directory = "/home/user/Documents/#Dev/AmazonHouse";
+  const directoryPath = directory + "/src";
+  readFilesInDirectory(directoryPath);
 };
 
 function executeCommand(command: string, callback?: () => void): Promise<void> {

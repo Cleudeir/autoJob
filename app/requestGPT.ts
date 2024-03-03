@@ -23,22 +23,7 @@ export const requestGPT = async ({
   sever = "ollama",
 }: Props): Promise<string | null> => {
   const prompType = [
-    `\nResponse-me only in this structure, json format, kardown code:\n
-    { 
-      "name": "",
-      "libs": "",
-      "input" (component inputs with types): "",
-      "output" (component output with types, if output is JSX.Element list all tags names and your attributes): ""
-    }
-    `,
-    `\nVerify json format, fix Property keys must be doublequoted, fix indentation, remover all comments, fix kardown code:\n
-    { 
-      "name": "",
-      "libs": "",
-      "input": "",
-      "output": ""
-    }
-    `,
+    `\nSummarize what this code does, use non-specialist language`,
   ];
 
   if (sever === "ollama") {
@@ -60,7 +45,7 @@ export const requestGPT = async ({
     };
 
     try {
-      console.log("start", type);
+      console.log("start");
       const time = Date.now();
       const response = await fetch(url, {
         method: "POST",
