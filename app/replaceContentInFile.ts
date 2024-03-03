@@ -18,12 +18,28 @@ export async function replaceContentInFile(
 
       if (!response) return;
 
-      await fsPromises.mkdir(localPathOut, {
+      //
+      const localPathFileName =
+        localPathOut + "/src/" + itemInputData.split("/src/")[0];
+      const localPathDir = localPathFileName.split("/").slice(0, -1).join("/");
+      await fsPromises.mkdir(localPathDir, {
         recursive: true,
       });
 
-      const _data = `path: ${itemInputData}\n\n${response}\n\n`;
+      const contentFilter = response.includes("```")
+        ? response.split("```")[1]
+        : response;
+      await fsPromises.writeFile(localPathFileName, contentFilter, "utf-8");
 
+      const response2 = await requestGPT({
+        content: content,
+        type: 1,
+      });
+      if (!response2) return;
+      await fsPromises.mkdir(localPathOut, {
+        recursive: true,
+      });
+      const _data = `path: ${itemInputData}\n\n${response2}\n\n`;
       await fsPromises.appendFile(
         localPathOut + "/summarize.txt",
         _data,

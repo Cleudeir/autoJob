@@ -23,6 +23,7 @@ export const requestGPT = async ({
   sever = "ollama",
 }: Props): Promise<string | null> => {
   const prompType = [
+    `this is typescript code, fix types "any", refactory this code, pls write complete code, response complete code, write only code, no comment, no explanation, no other information`,
     `\nSummarize what this code does, use non-specialist language`,
   ];
 
@@ -38,7 +39,7 @@ export const requestGPT = async ({
       options: {
         num_batch: 2,
         num_gqa: 1,
-        num_gpu: 32,
+        num_gpu: 24,
         main_gpu: 1,
         num_thread: 4,
       },
