@@ -17,7 +17,7 @@ async function find(directoryPath: string, file: string) {
   const filePath = path.join(directoryPath, file);
   const stats = await fsPromises.stat(filePath);
   if (stats.isFile()) {
-    if (filePath.includes(".ts") || filePath.includes(".js")) {
+    if (filePath.includes(".tsx") || filePath.includes(".jsx")) {
       console.log("filePath: ", filePath);
       await replaceContentInFile(filePath);
     }

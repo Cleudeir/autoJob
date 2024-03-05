@@ -16,6 +16,17 @@ type Props = {
   sever?: "lmStudio" | "ollama";
 };
 
+function extractCodeFromTripleBackticks(inputString: string) {
+  const regex = /```(?:json|jsx|tsx|javascript|typescript)?\n((?:.|\n)*?)```/g;
+  let result = "";
+  let match;
+
+  while ((match = regex.exec(inputString)) !== null) {
+    result += match[1];
+  }
+  return result;
+}
+
 export const requestGPT = async ({
   content,
   model = "deepseek-coder:6.7b",
@@ -23,15 +34,43 @@ export const requestGPT = async ({
   sever = "ollama",
 }: Props): Promise<string | null> => {
   const prompType = [
-    `this code is react native TypeScrept, refactory this code using this instructions:
+    `
+    this code is react native TypeScrept, refactory this code using this instructions:
     1. Remove code repeat create function to do not repeat code
     2. Remove all comments
     3. Retype this code, this is typescript code, fix types "any",
     4. Rename all variables to portuguese pt-br
     5. Write complete code
     6. Response complete code
-    7. write only code, no comment, no explanation, no other information`,
-    `\nSummarize what this code does, to be succinct`,
+    7. write only code, no comment, no explanation, no other information
+    `,
+    `
+    \nto be succinct json format with summary: 
+    {
+      "libs": string[] ,
+     "name" (obs.: exported function name): string,
+     "input": { [name: string]: type },
+     "variables inside function": { [name: string]: type },
+     "input" (obs.: Input fields business rule, example: <InputText value={nome} onChangeText={setNome} /> => { "input text": "user insert you name" }): { [input field business rule name: string]: business rule },
+     "explain" (explain to do): string,
+     "business rule" : string,
+     "styles" : string[],
+    }
+    use types to resume, return only json
+    `,
+    `
+    this code is react native TypeScrept, refactory this code using this instructions:
+    1. Remove code repeat create function to do not repeat code
+    2. Remove all comments
+    3. Retype this code, this is typescript code, fix types "any",
+    4. Rename all variables to portuguese pt-br
+    5. Write complete code
+    6. Response complete code
+    7. write only code, no comment, no explanation, no other information
+    `,
+    `
+    Create a new component based on this code, use only this code, no explanation, no other information, typescript code, code format
+    `,
   ];
 
   if (sever === "ollama") {
@@ -46,14 +85,14 @@ export const requestGPT = async ({
       options: {
         num_batch: 2,
         num_gqa: 1,
-        num_gpu: 16,
+        num_gpu: 32,
         main_gpu: 1,
         num_thread: 4,
       },
     };
+    console.log(" >>>>> start");
 
     try {
-      console.log("start");
       const time = Date.now();
       const response = await fetch(url, {
         method: "POST",
@@ -65,9 +104,8 @@ export const requestGPT = async ({
 
       const min = Math.floor((Date.now() - time) / 1000 / 60);
       const seg = Math.floor((Date.now() - time) / 1000) % 60;
-      console.log("end time: ", min, "min", seg, "seg");
-
-      return output;
+      console.log("  >>>>> end time: ", min, "min", seg, "seg");
+      return extractCodeFromTripleBackticks(output);
     } catch (error) {
       console.error("Error fetching response:", error);
       return null;

@@ -4,9 +4,8 @@ import { exec } from "child_process";
 
 const startModel = async (modelName = "deepseek-coder") => {
   await executeCommand("ollama list");
-  const directory = "/home/user/Documents/#Dev/AmazonHouse";
-  const directoryPath = directory + "/src";
-  readFilesInDirectory(directoryPath);
+  const directory = "/home/user/Documents/#Dev/AmazonHouse/src/components";
+  readFilesInDirectory(directory);
 };
 
 function executeCommand(command: string, callback?: () => void): Promise<void> {
