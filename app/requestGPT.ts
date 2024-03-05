@@ -51,7 +51,7 @@ export const requestGPT = async ({
      "name" (obs.: exported function name): string,
      "input": { [name: string]: type },
      "variables inside function": { [name: string]: type },
-     "input" (obs.: Input fields business rule, example: <InputText value={nome} onChangeText={setNome} /> => { "input text": "user insert you name" }): { [input field business rule name: string]: business rule },
+     "component React": list all one by one type input, with porpuse to use,
      "explain" (explain to do): string,
      "business rule" : string,
      "styles" : string[],
@@ -69,7 +69,7 @@ export const requestGPT = async ({
     7. write only code, no comment, no explanation, no other information
     `,
     `
-    Create a new component based on this code, use only this code, no explanation, no other information, typescript code, code format
+    Create a new component React native based on this code, use only this code, no explanation, no other information, typescript code, code format
     `,
   ];
 
@@ -90,10 +90,8 @@ export const requestGPT = async ({
         num_thread: 4,
       },
     };
-    console.log(" >>>>> start");
 
     try {
-      const time = Date.now();
       const response = await fetch(url, {
         method: "POST",
         body: JSON.stringify(body),
@@ -102,9 +100,6 @@ export const requestGPT = async ({
       const result = await response.json();
       const { response: output } = result;
 
-      const min = Math.floor((Date.now() - time) / 1000 / 60);
-      const seg = Math.floor((Date.now() - time) / 1000) % 60;
-      console.log("  >>>>> end time: ", min, "min", seg, "seg");
       return extractCodeFromTripleBackticks(output);
     } catch (error) {
       console.error("Error fetching response:", error);
