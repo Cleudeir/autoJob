@@ -6,29 +6,20 @@ let count = 0;
 export async function replaceContentInFile(
   itemInputData: string
 ): Promise<void> {
-  console.log(" >>>>> start");
+  console.log(" >>>>> start replaceContentInFile");
   const time = Date.now();
 
   const localPathFileName =
     localPathOut + "/src/" + itemInputData.split("/src/")[1];
   const localPathDir = localPathFileName.split("/").slice(0, -1).join("/");
-
-  if (count === 0) {
-    await fsPromises.writeFile(
-      localPathOut + "/summarize.txt",
-      "Sumary:\n\n",
-      "utf-8"
-    );
-    await fsPromises.writeFile(
-      localPathOut + "/teste.tsx",
-      "Sumary:\n\n",
-      "utf-8"
-    );
-  }
   count++;
   try {
     const contentRead = await fsPromises.readFile(itemInputData, "utf-8");
-    const content = `${contentRead}`;
+    const readStructure = await fsPromises.readFile(
+      localPathOut + "/structure.txt",
+      "utf-8"
+    );
+    const content = `structure project:\n${readStructure}\n${contentRead} `;
 
     //
     if (false) {

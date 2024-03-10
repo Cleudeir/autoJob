@@ -1,11 +1,18 @@
 import { readFilesInDirectory } from "./readFiles";
-import { replaceContentInFile } from "./replaceContentInFile";
 import { exec } from "child_process";
+import fsPromises from "fs/promises";
 
 const startModel = async (modelName = "deepseek-coder") => {
+  const localPathOut = __dirname.replace("app", "output");
   await executeCommand("ollama list");
   const directory = "/home/user/Documents/#Dev/AmazonHouse/src/components";
-  readFilesInDirectory(directory);
+  //
+  await fsPromises.writeFile(localPathOut + "/structure.txt", "", "utf-8");
+  await readFilesInDirectory(directory, "struture");
+  //
+  await fsPromises.writeFile(localPathOut + "/summarize.txt", "", "utf-8");
+  await fsPromises.writeFile(localPathOut + "/teste.tsx", "", "utf-8");
+  await readFilesInDirectory(directory, "summary");
 };
 
 function executeCommand(command: string, callback?: () => void): Promise<void> {

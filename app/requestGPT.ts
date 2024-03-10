@@ -4,7 +4,10 @@ const fetch = (...args) =>
 type Props = {
   content: string;
   model?:
+    | "codellama:7b"
+    | "codellama:13b"
     | "llama2"
+    | "deepseek-coder"
     | "gemma:7b"
     | "deepseek-coder:6.7b"
     | "deepseek-coder:33b"
@@ -29,7 +32,7 @@ function extractCodeFromTripleBackticks(inputString: string) {
 
 export const requestGPT = async ({
   content,
-  model = "deepseek-coder:6.7b",
+  model = "codellama:7b",
   type = 0,
   sever = "ollama",
 }: Props): Promise<string | null> => {
@@ -51,7 +54,8 @@ export const requestGPT = async ({
      "name" (obs.: exported function name): string,
      "input": { [name: string]: type },
      "variables inside function": { [name: string]: type },
-     "component React": list all one by one type input, with porpuse to use,
+     "useState": { [name: string]: type },
+     "component React": list all,
      "explain" (explain to do): string,
      "business rule" : string,
      "styles" : string[],
@@ -85,7 +89,7 @@ export const requestGPT = async ({
       options: {
         num_batch: 2,
         num_gqa: 1,
-        num_gpu: 32,
+        num_gpu: 16,
         main_gpu: 1,
         num_thread: 4,
       },
