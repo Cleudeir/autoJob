@@ -3,6 +3,7 @@ import * as path from "path";
 import * as fsPromises from "fs/promises";
 import { replaceContentInFile } from "./replaceContentInFile";
 import { strutureFiles } from "./strutureFiles";
+import { uniqueProject } from "./uniqueProject";
 
 const localPath = __dirname.replace("app", "");
 
@@ -17,16 +18,18 @@ if (!fs.existsSync(localPath + "/input/")) {
 async function find(
   directoryPath: string,
   file: string,
-  type: "struture" | "summary"
+  type: "structure" | "summary" | "uniqueProject"
 ) {
   const filePath = path.join(directoryPath, file);
   const stats = await fsPromises.stat(filePath);
   if (stats.isFile()) {
     if (filePath.includes(".ts") || filePath.includes(".js")) {
-      if (type === "struture") {
+      if (type === "structure") {
         await strutureFiles(filePath);
       } else if (type === "summary") {
         await replaceContentInFile(filePath);
+      } else if (type === "uniqueProject") {
+        await uniqueProject(filePath);
       }
     }
   } else if (stats.isDirectory()) {
@@ -36,7 +39,7 @@ async function find(
 
 export async function readFilesInDirectory(
   directoryPath: string,
-  type: "struture" | "summary"
+  type: "structure" | "summary" | 'uniqueProject'
 ): Promise<void> {
   try {
     const files = await fsPromises.readdir(directoryPath);
