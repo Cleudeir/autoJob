@@ -21,53 +21,45 @@ export async function replaceContentInFile(
     );
     const content = `structure project:\n${readStructure}\n${contentRead} `;
 
-    //
-    if (false) {
-      const response = await requestGPT({
-        content: content,
-        type: 0,
-      });
-
-      if (!response) return;
-      await fsPromises.mkdir(localPathDir, {
-        recursive: true,
-      });
-      fsPromises.writeFile(localPathFileName, response, "utf-8");
-    }
-
-    if (true) {
-      const response2 = await requestGPT({
-        content: content,
-        type: 1,
-      });
-      if (!response2) return;
-      await fsPromises.mkdir(localPathOut, {
-        recursive: true,
-      });
-      const _data = `path: ${itemInputData.split("/src/")[1]}
+    const response2 = await requestGPT({
+      content: `${content} +  \nto be succinct json format with summary: 
+        {
+          "libs": string[] ,
+         "name" (obs.: exported function name): string,
+         "input": { [name: string]: type },
+         "useState": { [name: string]: type },
+         "component React": list all,
+         "explain" (explain to do): string,
+         "business rule" : string,  
+        }
+        use types to resume, return only json`,
+    });
+    if (!response2) return;
+    await fsPromises.mkdir(localPathOut, {
+      recursive: true,
+    });
+    const _data = `path: ${itemInputData.split("/src/")[1]}
       \n\n${response2}\n\n`;
 
-      await fsPromises.appendFile(
-        localPathOut + "/summarize.txt",
-        _data,
-        "utf-8"
-      );
+    await fsPromises.appendFile(
+      localPathOut + `/${Date.now() / 1000}_summarize.txt`,
+      _data,
+      "utf-8"
+    );
 
-      const response3 = await requestGPT({
-        content: _data,
-        type: 3,
-      });
+    const response3 = await requestGPT({
+      content: `${_data} +  \nCreate a new component React native based on this code, use only this code, no explanation, no other information, typescript code, code format`,
+    });
 
-      if (!response3) return;
-      await fsPromises.mkdir(localPathOut, {
-        recursive: true,
-      });
-      await fsPromises.appendFile(
-        localPathOut + "/teste.tsx",
-        response3,
-        "utf-8"
-      );
-    }
+    if (!response3) return;
+    await fsPromises.mkdir(localPathOut, {
+      recursive: true,
+    });
+    await fsPromises.appendFile(
+      localPathOut + `/${Date.now() / 1000}_recreate.txt`,
+      response3,
+      "utf-8"
+    );
   } catch (error) {
     console.error("error: ", error);
   }

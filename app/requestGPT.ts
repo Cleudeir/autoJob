@@ -33,63 +33,20 @@ function extractCodeFromTripleBackticks(inputString: string) {
 export const requestGPT = async ({
   content,
   model = "codellama",
-  type = 0,
   sever = "ollama",
-}: Props): Promise<string | null> => {
-  const prompType = [
-    `
-    this code is react native TypeScrept, refactory this code using this instructions:
-    1. Remove code repeat create function to do not repeat code
-    2. Remove all comments
-    3. Retype this code, this is typescript code, fix types "any",
-    4. Rename all variables to portuguese pt-br
-    5. Write complete code
-    6. Response complete code
-    7. write only code, no comment, no explanation, no other information
-    `,
-    `
-    \nto be succinct json format with summary: 
-    {
-      "libs": string[] ,
-     "name" (obs.: exported function name): string,
-     "input": { [name: string]: type },
-     "variables inside function": { [name: string]: type },
-     "useState": { [name: string]: type },
-     "component React": list all,
-     "explain" (explain to do): string,
-     "business rule" : string,
-     "styles" : string[],
-    }
-    use types to resume, return only json
-    `,
-    `
-    this code is react native TypeScrept, refactory this code using this instructions:
-    1. Remove code repeat create function to do not repeat code
-    2. Remove all comments
-    3. Retype this code, this is typescript code, fix types "any",
-    4. Rename all variables to portuguese pt-br
-    5. Write complete code
-    6. Response complete code
-    7. write only code, no comment, no explanation, no other information
-    `,
-    `
-    Create a new component React native based on this code, use only this code, no explanation, no other information, typescript code, code format
-    `,
-  ];
+}: Props): Promise<string | undefined> => {
+  const time = Date.now();
 
   if (sever === "ollama") {
     const url = "http://localhost:11434/api/generate";
-
     const body = {
       model,
-      prompt: `${content}
-      ${prompType[type]}
-    `,
+      prompt: `${content}`,
       stream: false,
       options: {
         num_batch: 2,
         num_gqa: 1,
-        num_gpu: 32,
+        num_gpu: 28,
         main_gpu: 1,
         num_thread: 4,
       },
@@ -107,15 +64,12 @@ export const requestGPT = async ({
       return extractCodeFromTripleBackticks(output);
     } catch (error) {
       console.error("Error fetching response:", error);
-      return null;
+      return undefined;
     }
   } else if (sever === "lmStudio") {
     const url = "http://localhost:1234/v1/completions";
-
     const body = {
-      prompt: `${content}
-      ${prompType[type]}     
-    `,
+      prompt: `${content}`,
       temperature: 0.7,
       stream: false,
       max_tokens: -1,
@@ -130,20 +84,15 @@ export const requestGPT = async ({
         },
         body: JSON.stringify(body),
       });
-
       const result = await response.json();
       const { response: output } = result;
-
-      const min = Math.floor((Date.now() - time) / 1000 / 60);
-      const seg = Math.floor((Date.now() - time) / 1000) % 60;
-      console.log("end time: ", min, "min", seg, "seg");
-
       return output;
     } catch (error) {
       console.error("Error fetching response:", error);
-      return null;
+      return undefined;
     }
-  } else {
-    return null;
   }
+  const min = Math.floor((Date.now() - time) / 1000 / 60);
+  const seg = Math.floor((Date.now() - time) / 1000) % 60;
+  console.log("end time: ", min, "min", seg, "seg");
 };
