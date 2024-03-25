@@ -1,5 +1,6 @@
-const fetch = (...args) =>
+const fetch = (...args: any[]) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
+import { apiKey } from "../.env.ts";
 
 type Props = {
   content: string;
@@ -9,14 +10,16 @@ type Props = {
     | "llama2"
     | "deepseek-coder"
     | "gemma:7b"
+    | "gemma:2b"
     | "deepseek-coder:6.7b"
     | "deepseek-coder:33b"
     | "deepseek-coder:1.3b-base"
-    | "mixtral";
+    | "mixtral"
+    | "mistral";
   maxTokens?: number;
   temperature?: number;
   type?: number;
-  sever?: "lmStudio" | "ollama";
+  server?: "lmStudio" | "ollama" | "openai";
 };
 
 function extractCodeFromTripleBackticks(inputString: string) {
@@ -32,12 +35,12 @@ function extractCodeFromTripleBackticks(inputString: string) {
 
 export const requestGPT = async ({
   content,
-  model = "codellama",
-  sever = "ollama",
+  model = "mistral",
+  server = "ollama",
 }: Props): Promise<string | undefined> => {
   const time = Date.now();
 
-  if (sever === "ollama") {
+  if (server === "ollama") {
     const url = "http://localhost:11434/api/generate";
     const body = {
       model,
@@ -46,7 +49,7 @@ export const requestGPT = async ({
       options: {
         num_batch: 2,
         num_gqa: 1,
-        num_gpu: 28,
+        num_gpu: 32,
         main_gpu: 1,
         num_thread: 4,
       },
@@ -66,7 +69,7 @@ export const requestGPT = async ({
       console.error("Error fetching response:", error);
       return undefined;
     }
-  } else if (sever === "lmStudio") {
+  } else if (server === "lmStudio") {
     const url = "http://localhost:1234/v1/completions";
     const body = {
       prompt: `${content}`,
@@ -91,7 +94,33 @@ export const requestGPT = async ({
       console.error("Error fetching response:", error);
       return undefined;
     }
+  } else if (server === "openai") {
+    const url = "https://api.openai.com/v1/completions";
+    const prompt = `${content}`;
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          prompt,
+          model: "text-davinci-003", // Adjust model name if necessary
+          temperature: 0.7,
+          max_tokens: 300, // Adjust based on your requirements
+        }),
+      });
+
+      const result = await response.json();
+      return result.choices[0].text.trim();
+    } catch (error) {
+      console.error("Error fetching response:", error);
+      return undefined;
+    }
   }
+
   const min = Math.floor((Date.now() - time) / 1000 / 60);
   const seg = Math.floor((Date.now() - time) / 1000) % 60;
   console.log("end time: ", min, "min", seg, "seg");

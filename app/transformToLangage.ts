@@ -24,17 +24,16 @@ export async function transformToLangage(itemInputData: string): Promise<void> {
     const contentRead = await fsPromises.readFile(itemInputData, "utf-8");
 
     const response2 = await requestGPT({
-      content: `${contentRead} +  
-      i am need create text version to 'English',  'Brazilian', 'spanish'
-      create new variable object named
-  
-      const texto = { 
-        'English' : {[key: string]: string]}
-        'Brazilian' : {[key: string]: string]}
-        'spanish' : {[key: string]: string]}
-    }
-    import variable "idioma" from "config/index.ts"
-    use variable 'texto[idioma]' to set texts show screen
+      content: `${contentRead}
+you are coder assistant. JavaScript / Typescript. using Lib React Native.
+create variable named "texto" with all texts inside code 
+struture : 
+      export const texto = { 
+        'English' : {[simplyName: string]: string]}
+        'Brazilian' : {[simplyName: string]: string]}
+        'spanish' : {[simplyName: string]: string]}
+      }
+write only this variavel, no comment, no explain
       `,
     });
     if (!response2) return;
