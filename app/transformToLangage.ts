@@ -4,6 +4,9 @@ import { requestGPT } from "./requestGPT";
 const localPathOut = __dirname.replace("app", "output");
 
 export async function transformToLangage(itemInputData: string): Promise<void> {
+  if (itemInputData.toLocaleLowerCase().includes("styles.js")) {
+    return;
+  }
   console.log(" >>>>> start replaceContentInFile");
   const time = Date.now();
 
@@ -28,11 +31,11 @@ export async function transformToLangage(itemInputData: string): Promise<void> {
 you are coder assistant. JavaScript / Typescript. using Lib React Native.
 create variable named "texto" with all texts inside code 
 struture : 
-      export const texto = { 
-        'English' : {[simplyName: string]: string]}
-        'Brazilian' : {[simplyName: string]: string]}
-        'spanish' : {[simplyName: string]: string]}
-      }
+export const texto = { 
+  'English' : {[simplyName: string]: string]}
+  'Brazilian' : {[simplyName: string]: string]}
+  'spanish' : {[simplyName: string]: string]}
+}
 write only this variavel, no comment, no explain
       `,
     });

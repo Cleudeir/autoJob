@@ -30,6 +30,9 @@ function extractCodeFromTripleBackticks(inputString: string) {
   while ((match = regex.exec(inputString)) !== null) {
     result += match[1];
   }
+  if (result === "") {
+    result = inputString;
+  }
   return result;
 }
 
