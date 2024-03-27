@@ -1,13 +1,13 @@
 import * as fsPromises from "fs/promises";
 import { requestGPT } from "./requestGPT";
+import { checkFileExists } from "./checkFileExists";
 
 const localPathOut = __dirname.replace("app", "output");
 
 export async function transformToLangage(itemInputData: string): Promise<void> {
-  if (itemInputData.toLocaleLowerCase().includes("styles.js")) {
+  if (itemInputData.toLocaleLowerCase().includes("style")) {
     return;
-  }
-  console.log(" >>>>> start replaceContentInFile");
+  } else console.log(" >>>>> start replaceContentInFile");
   const time = Date.now();
 
   const pathFile = "src/" + itemInputData.split("/src/")[1];
@@ -15,6 +15,11 @@ export async function transformToLangage(itemInputData: string): Promise<void> {
   const version = "/";
   const localPathFileName = localPathOut + version + pathFile;
   const localPathDir = localPathOut + version + path;
+
+  const exist = await checkFileExists(localPathFileName);
+  if (exist === true) {
+    return;
+  }
 
   console.log("localPathFileName: ", localPathFileName);
   console.log("localPathDir: ", localPathDir);

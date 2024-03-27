@@ -11,9 +11,6 @@ const localPath = __dirname.replace("app", "");
 if (!fs.existsSync(localPath + "/output/")) {
   fs.mkdirSync(localPath + "/output/", { recursive: true });
 }
-if (!fs.existsSync(localPath + "/input/")) {
-  fs.mkdirSync(localPath + "/input/", { recursive: true });
-}
 
 // function
 async function find(

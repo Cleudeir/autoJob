@@ -12,6 +12,7 @@ const startModel = async (modelName = "deepseek-coder") => {
   await readFilesInDirectory(directory, "summary");
   */
   await readFilesInDirectory(directory, "transformToLangage");
+  await executeCommand("echo finalizando o app");
 };
 
 function executeCommand(command: string, callback?: () => void): Promise<void> {
