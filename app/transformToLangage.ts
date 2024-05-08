@@ -41,10 +41,12 @@ create variable named "texts" with all text will show in this screen.
 create variable named "language" with value "English". you need to define currente language ( texts[language] ).
 
 response using this struture:
+      const language = "en";
       const texts = { 
         en : {[uniqueWord: string]: string]}
         ptBr : {[uniqueWord: string]: string]}
         es : {[uniqueWord: string]: string]}
+        fr : {[uniqueWord: string]: string]}
       }
       return (
         {content with texts[language]}
@@ -52,10 +54,15 @@ response using this struture:
 
 
  exemple: 
- code 'return (<View><Text>ola mundo</Text></View>)'
+ code ' return (
+  <View> 
+      <OtherComponents/>
+      <Text>ola mundo</Text>
+      <OtherComponents/>
+  </View>) '
 
  response: 'javascript
-  const language = "English";
+  const language = "en";
   const texts = {
     en : {
       'helloWorld' : 'hello world',
@@ -66,8 +73,19 @@ response using this struture:
     es : {
       'helloWorld' : 'hola mundo',
     }
+    fr: {
+      'helloWorld' : 'bonjour monde',
+    }
   }
-  return (<View><Text>{texts[language]}</Text></View>)
+  return (
+  <View> 
+      <OtherComponents/>
+      <Text>{texts[language]}</Text>
+      <OtherComponents/>
+  </View>)
+
+
+  not summarize code.
  '
 `;
 
