@@ -4,18 +4,7 @@ import { apiKey } from "../.env.ts";
 
 type Props = {
   content: string;
-  model?:
-    | "codellama"
-    | "codellama:13b"
-    | "llama2"
-    | "deepseek-coder"
-    | "gemma:7b"
-    | "gemma:2b"
-    | "deepseek-coder:6.7b"
-    | "deepseek-coder:33b"
-    | "deepseek-coder:1.3b-base"
-    | "mixtral"
-    | "mistral";
+  model?: string;
   maxTokens?: number;
   temperature?: number;
   type?: number;
@@ -23,12 +12,29 @@ type Props = {
 };
 
 function extractCodeFromTripleBackticks(inputString: string) {
-  const regex = /```(?:json|jsx|tsx|javascript|typescript)?\n((?:.|\n)*?)```/g;
+  const regex = /```(javascript|jsx|ts|\n)([\s\S]+?)```/g;
   let result = "";
   let match;
 
   while ((match = regex.exec(inputString)) !== null) {
-    result += match[1];
+    result += match[2];
+  }
+  if (result === "") {
+    result = inputString;
+  }
+  if (result.includes("```")) {
+    //result = verifyCode(result);
+  }
+  return result;
+}
+function verifyCode(inputString: string) {
+  console.log("inputString: ", JSON.stringify(inputString, null, 2));
+  const regex = /```[\s\S]+?```/g;
+  let result = "";
+  let match;
+
+  while ((match = regex.exec(inputString)) !== null) {
+    result += match[2];
   }
   if (result === "") {
     result = inputString;
@@ -38,23 +44,22 @@ function extractCodeFromTripleBackticks(inputString: string) {
 
 export const requestGPT = async ({
   content,
-  model = "mistral",
+  model = "llama3",
   server = "ollama",
 }: Props): Promise<string | undefined> => {
   const time = Date.now();
-
   if (server === "ollama") {
-    const url = "http://localhost:11434/api/generate";
+    const url = "http://127.0.0.1:11434/api/generate";
     const body = {
       model,
       prompt: `${content}`,
       stream: false,
       options: {
-        num_batch: 2,
-        num_gqa: 1,
-        num_gpu: 32,
+        //num_batch: 4,
+        //num_gqa: 4,
+        // num_gpu: 48,
         main_gpu: 1,
-        num_thread: 4,
+        // num_thread: 4,
       },
     };
 
@@ -65,6 +70,10 @@ export const requestGPT = async ({
       });
 
       const result = await response.json();
+      if (result.error) {
+        console.error("Error fetching response:", result.error);
+        return undefined;
+      }
       const { response: output } = result;
 
       return extractCodeFromTripleBackticks(output);

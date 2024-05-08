@@ -4,10 +4,9 @@ import fsPromises from "fs/promises";
 
 const startModel = async (modelName = "deepseek-coder") => {
   const localPathOut = __dirname.replace("app", "output");
-  await executeCommand("ollama list");
   const directory = "/home/user/Documents/Prod/gotogether/src/screens";
-  /*
   await readFilesInDirectory(directory, "structure");
+  /*
   await readFilesInDirectory(directory, "uniqueProject");
   await readFilesInDirectory(directory, "summary");
   */
