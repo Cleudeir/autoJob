@@ -1,31 +1,40 @@
 import * as fsPromises from "fs/promises";
-import { checkFileExists } from "./checkFileExists";
-import { requestGPT } from "./requestGPT";
+import { checkFileExists } from "../utils/checkFileExists";
+import { ollama } from "../gpt/ollama";
 
-const localPathOut = __dirname.replace("app", "output");
+const localPathOut = __dirname.split("src")[0]+ 'output/transformToLanguage';
+
 
 const extractReturnText = (code: string) => {
-  const regex = /return\s+([^;]+);/g;
-  let match;
-  let lastReturnText = "";
-  while ((match = regex.exec(code))) {
-    lastReturnText = match[1]; // Capture text after "return"
+  const lastIndex = code.lastIndexOf("return");
+  if (lastIndex !== -1) {
+    const text = code.substring(lastIndex);
+    return text;
+  } else {
+    return "";
   }
-  return `return ${lastReturnText}`;
 };
 
-export async function transformToLangage(itemInputData: string): Promise<void> {
+export async function transformToLanguage(itemInputData: string): Promise<void> {
   if (itemInputData.toLocaleLowerCase().includes("style")) {
     return;
   }
+
   const time = Date.now();
 
-  const pathFile = "src/" + itemInputData.split("/src/")[1];
+  const pathFile = "src/" + itemInputData.split("/src/")[1]; 
+  
   const path = pathFile.split("/").slice(0, -1).join("/");
   const version = "/";
-  const localPathFileName = localPathOut + version + pathFile;
+  const localPathFileName = localPathOut + version + pathFile; 
   const localPathDir = localPathOut + version + path;
 
+
+  await fsPromises.mkdir(localPathDir, {
+    recursive: true,
+  });
+
+ 
   const exist = await checkFileExists(localPathFileName);
   if (exist === true) {
     return;
@@ -34,13 +43,13 @@ export async function transformToLangage(itemInputData: string): Promise<void> {
   try {
     const contentRead = await fsPromises.readFile(itemInputData, "utf-8");
 
-    let prompt = `
+    let command = `
 you are coder assistant. JavaScript. using Lib React Native. no comment, no explain, only create code.
-you are best developer. coding in javascript. no explain. atention write complete code. use camelcase to named variables
+you are best developer. coding in javascript. no explain. attention write complete code. use camelCase to named variables
 create variable named "texts" with all text will show in this screen.
-create variable named "language" with value "English". you need to define currente language ( texts[language] ).
+create variable named "language" with value "English". you need to define current language ( texts[language] ).
 
-response using this struture:
+response using this structure:
       const language = "en";
       const texts = { 
         en : {[uniqueWord: string]: string]}
@@ -88,17 +97,20 @@ response using this struture:
   not summarize code.
  '
 `;
-
-    let response = await requestGPT({
-      content: `${extractReturnText(contentRead)}
-      ${prompt}`,
+    const content = extractReturnText(contentRead);
+    const input = `${content} ${command}`;
+    let response = await ollama({
+      content: input,
     });
 
     if (!response) return;
 
-    await fsPromises.mkdir(localPathDir, {
-      recursive: true,
+    response = await ollama({
+      content: `that is input:${input}, that is output: ${response}, verify if response is correct, if not, change it. certificate that code was complete.`,
     });
+    if (!response) return;
+
+    
 
     await fsPromises.writeFile(localPathFileName, response, "utf-8");
   } catch (error) {

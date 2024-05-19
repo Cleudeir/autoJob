@@ -1,6 +1,7 @@
 import * as fsPromises from "fs/promises";
 
-const localPathOut = __dirname.replace("app", "output");
+const localPathOut = __dirname.split("src")[0]+ 'output/uniqueFile';
+
 
 export async function uniqueProject(itemInputData: string): Promise<void> {
   try {

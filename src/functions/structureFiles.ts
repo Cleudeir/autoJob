@@ -1,8 +1,8 @@
 import * as fsPromises from "fs/promises";
 
-const localPathOut = __dirname.replace("app", "output");
+const localPathOut = __dirname.replace("src", "output");
 
-export async function strutureFiles(itemInputData: string): Promise<void> {
+export async function structureFiles(itemInputData: string): Promise<void> {
   try {
     const [fileName] = itemInputData.split("/src/");
     await fsPromises.mkdir(localPathOut, {
