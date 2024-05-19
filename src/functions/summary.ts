@@ -7,7 +7,7 @@ let count = 0;
 export async function summary(
   itemInputData: string
 ): Promise<void> {
-  console.log(" >>>>> start replaceContentInFile");
+ 
   const time = Date.now();
   if(count === 0 ){
     count += 1;

@@ -38,8 +38,7 @@ export async function transformToLanguage(itemInputData: string): Promise<void> 
   const exist = await checkFileExists(localPathFileName);
   if (exist === true) {
     return;
-  }
-  console.log("localPathFileName: ", localPathFileName);
+  }  
   try {
     const contentRead = await fsPromises.readFile(itemInputData, "utf-8");
 
@@ -97,7 +96,7 @@ response using this structure:
   not summarize code.
  '
 `;
-    const content = extractReturnText(contentRead);
+    const content = extractReturnText(contentRead); 
     const input = `${content} ${command}`;
     let response = await ollama({
       content: input,
