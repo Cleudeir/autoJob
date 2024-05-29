@@ -10,7 +10,7 @@ async function find(
   const stats = await fsPromises.stat(filePath);
   if (stats.isFile()) {
     if (filePath.includes(".ts") || filePath.includes(".js")) {
-     await callback(filePath)
+      await callback(filePath)
     }
   } else if (stats.isDirectory()) {
     await readFilesInDirectory(filePath, callback);

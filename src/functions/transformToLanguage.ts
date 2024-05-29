@@ -1,48 +1,10 @@
 import * as fsPromises from "fs/promises";
 import { checkFileExists } from "../utils/checkFileExists";
 import { ollama } from "../gpt/ollama";
+import { extractCodeFromTripleBackticks } from '../utils/extractCodeFromTripleBackticks';
 
-const localPathOut = __dirname.split("src")[0]+ 'output/transformToLanguage';
-
-
-const extractReturnText = (code: string) => {
-  const lastIndex = code.lastIndexOf("return");
-  if (lastIndex !== -1) {
-    const text = code.substring(lastIndex);
-    return text;
-  } else {
-    return "";
-  }
-};
-
-export async function transformToLanguage(itemInputData: string): Promise<void> {
-  if (itemInputData.toLocaleLowerCase().includes("style")) {
-    return;
-  }
-
-  const time = Date.now();
-
-  const pathFile = "src/" + itemInputData.split("/src/")[1]; 
-  
-  const path = pathFile.split("/").slice(0, -1).join("/");
-  const version = "/";
-  const localPathFileName = localPathOut + version + pathFile; 
-  const localPathDir = localPathOut + version + path;
-
-
-  await fsPromises.mkdir(localPathDir, {
-    recursive: true,
-  });
-
- 
-  const exist = await checkFileExists(localPathFileName);
-  if (exist === true) {
-    return;
-  }  
-  try {
-    const contentRead = await fsPromises.readFile(itemInputData, "utf-8");
-
-    let command = `
+const localPathOut = __dirname.split("src")[0] + "output/transformToLanguage";
+const promptBase = `
 you are coder assistant. JavaScript. using Lib React Native. no comment, no explain, only create code.
 you are best developer. coding in javascript. no explain. attention write complete code. use camelCase to named variables
 create variable named "texts" with all text will show in this screen.
@@ -96,8 +58,46 @@ response using this structure:
   not summarize code.
  '
 `;
-    const content = extractReturnText(contentRead); 
-    const input = `${content} ${command}`;
+
+const extractReturnText = (code: string) => {
+  const lastIndex = code.lastIndexOf("return");
+  if (lastIndex !== -1) {
+    const text = code.substring(lastIndex);
+    return text;
+  } else {
+    return "";
+  }
+};
+
+export async function transformToLanguage(
+  itemInputData: string
+): Promise<void> {
+  if (itemInputData.toLocaleLowerCase().includes("style")) {
+    return;
+  }
+
+  const time = Date.now();
+
+  const pathFile = "src/" + itemInputData.split("/src/")[1];
+
+  const path = pathFile.split("/").slice(0, -1).join("/");
+  const version = "/";
+  const localPathFileName = localPathOut + version + pathFile;
+  const localPathDir = localPathOut + version + path;
+
+  await fsPromises.mkdir(localPathDir, {
+    recursive: true,
+  });
+
+  const exist = await checkFileExists(localPathFileName);
+  if (exist === true) {
+    return;
+  }
+  try {
+    const contentRead = await fsPromises.readFile(itemInputData, "utf-8");
+
+    const content = extractReturnText(contentRead);
+    const input = `${content} ${promptBase}`;
     let response = await ollama({
       content: input,
     });
@@ -105,13 +105,11 @@ response using this structure:
     if (!response) return;
 
     response = await ollama({
-      content: `that is input:${input}, that is output: ${response}, verify if response is correct, if not, change it. certificate that code was complete.`,
+      content: `that is input:${input}, that is output: ${extractCodeFromTripleBackticks(response)}, verify if response is correct, if not, change it. certificate that code was complete.`,
     });
     if (!response) return;
 
-    
-
-    await fsPromises.writeFile(localPathFileName, response, "utf-8");
+    await fsPromises.writeFile(localPathFileName, extractCodeFromTripleBackticks(response), "utf-8");
   } catch (error) {
     console.error("error: ", error);
   }

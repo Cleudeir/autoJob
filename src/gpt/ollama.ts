@@ -48,7 +48,7 @@ export const ollama = async ({
     const seg = Math.floor((Date.now() - time) / 1000) % 60;
     console.log("end time: ", min, "min", seg, "seg");
 
-    return extractCodeFromTripleBackticks(output);
+    return output;
   } catch (error) {
     console.error("Error fetching response:", error);
     return undefined;

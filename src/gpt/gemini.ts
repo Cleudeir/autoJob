@@ -40,15 +40,12 @@ export const gemini = async ({ content, model = 'gemini-pro' }: Props) => {
     );
 
     const responseData = await response.json();
+    console.log('responseData: ', JSON.stringify(responseData, null, 2));
 
     if (!responseData) return
-    const parsedResponse = JSON.parse(
-      extractCodeFromTripleBackticks(
-        responseData.candidates[0].content.parts[0].text,
-      ),
-    );
+    const parsedResponse = responseData.candidates[0].content.parts[0].text;
+    console.log('parsedResponse: ', JSON.stringify(parsedResponse, null, 2));
     return parsedResponse;
-
   } catch (error) {
     console.error("Error fetching response:", error);
     return undefined;

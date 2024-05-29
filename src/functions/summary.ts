@@ -1,25 +1,26 @@
 import * as fsPromises from "fs/promises";
 import { ollama } from "../gpt/ollama";
+import { extractCodeFromTripleBackticks } from '../utils/extractCodeFromTripleBackticks';
 
-const localPathOut = __dirname.split("src")[0]+ 'output/summary';
+const localPathOut = __dirname.split("src")[0] + 'output/summary';
 
 let count = 0;
 export async function summary(
   itemInputData: string
 ): Promise<void> {
- 
+
   const time = Date.now();
-  if(count === 0 ){
+  if (count === 0) {
     count += 1;
     await fsPromises.writeFile(
       localPathOut + `/summarize.txt`,
       '',
       "utf-8"
-    ); 
+    );
   }
-  
+
   try {
-    const contentRead = await fsPromises.readFile(itemInputData, "utf-8");  
+    const contentRead = await fsPromises.readFile(itemInputData, "utf-8");
     const response = await ollama({
       content: `${contentRead} +  \nto be create succinct summary not technical, explain business rule this file`,
     });
@@ -28,13 +29,13 @@ export async function summary(
       recursive: true,
     });
     const _data = `path: ${itemInputData.split("/src/")[1]}
-      \n\n${response}\n\n`;
+      \n\n${extractCodeFromTripleBackticks(response)}\n\n`;
 
     await fsPromises.appendFile(
       localPathOut + `/summarize.txt`,
       _data,
       "utf-8"
-    ); 
+    );
   } catch (error) {
     console.error("error: ", error);
   }

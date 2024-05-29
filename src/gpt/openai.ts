@@ -1,6 +1,6 @@
 const fetch = (...args: any[]) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
-import { OPENAI_API_KEY} from "../../.env.js";
+import { OPENAI_API_KEY } from "../../.env.js";
 import { extractCodeFromTripleBackticks } from "../utils/extractCodeFromTripleBackticks.js";
 
 type Props = {
@@ -43,7 +43,7 @@ export const openai = async ({
     const seg = Math.floor((Date.now() - time) / 1000) % 60;
     console.log("end time: ", min, "min", seg, "seg");
 
-    return extractCodeFromTripleBackticks(result.choices[0].text.trim());
+    return result.choices[0].text.trim();
   } catch (error) {
     console.error("Error fetching response:", error);
     return undefined;

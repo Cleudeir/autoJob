@@ -4,8 +4,9 @@ import { summary } from "../functions/summary";
 import { transformToLanguage } from "../functions/transformToLanguage";
 import { uniqueProject } from "../functions/uniqueProject";
 import { structureFiles } from "../functions/structureFiles";
+import { separateCodeLogic } from "../functions/separateCodeLogic";
 
-export const core = async (argument: 'structure' | 'transformToLanguage' | 'summary' | 'uniqueProject', directory: string) => {
+export const core = async (argument: 'structure' | 'transformToLanguage' | 'summary' | 'uniqueProject' | 'separateCodeLogic', directory: string) => {
   if (argument === "structure") {
     return await readFilesInDirectory(directory, async (filePath) => await structureFiles(filePath));
   } else if (argument === 'transformToLanguage') {
@@ -14,6 +15,8 @@ export const core = async (argument: 'structure' | 'transformToLanguage' | 'summ
     await readFilesInDirectory(directory, async (filePath) => await uniqueProject(filePath));
   } else if (argument === 'summary') {
     await readFilesInDirectory(directory, async (filePath) => await summary(filePath));
+  } else if (argument === 'separateCodeLogic') {
+    await readFilesInDirectory(directory, async (filePath) => await separateCodeLogic(filePath));
   }
   await executeCommand("echo finalizando o app");
 };

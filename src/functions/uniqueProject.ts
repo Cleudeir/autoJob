@@ -1,11 +1,11 @@
 import * as fsPromises from "fs/promises";
 
-const localPathOut = __dirname.split("src")[0]+ 'output/uniqueFile';
+const localPathOut = __dirname.split("src")[0] + 'output/uniqueFile';
 
 
 export async function uniqueProject(itemInputData: string): Promise<void> {
   try {
-    const [fileName] = itemInputData.split('/src/')   
+    const [fileName] = itemInputData.split('/src/')
     const contentRead = await fsPromises.readFile(itemInputData, "utf-8");
     await fsPromises.mkdir(localPathOut, {
       recursive: true,
@@ -17,5 +17,5 @@ export async function uniqueProject(itemInputData: string): Promise<void> {
     );
   } catch (error) {
     console.error("error: ", error);
-  }  
+  }
 }
