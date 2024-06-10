@@ -12,7 +12,7 @@ type Props = {
 
 export const ollama = async ({
   content,
-  model = "llama3",
+  model = 'llama3' || "phi3:14b-medium-128k-instruct-q3_K_M",
 }: Props): Promise<string | undefined> => {
   const time = Date.now();
 
