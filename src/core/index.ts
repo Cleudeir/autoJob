@@ -15,6 +15,7 @@ export const core = async (argument: 'structure' | 'transformToLanguage' | 'summ
     await readFilesInDirectory(directory, async (filePath) => await uniqueProject(filePath));
   } else if (argument === 'summary') {
     await readFilesInDirectory(directory, async (filePath) => await summary(filePath));
+    await readFilesInDirectory(__dirname.split("src")[0] + 'output/summary', async (filePath) => await summary(filePath));
   } else if (argument === 'separateCodeLogic') {
     await readFilesInDirectory(directory, async (filePath) => await separateCodeLogic(filePath));
   }

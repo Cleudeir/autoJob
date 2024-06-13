@@ -9,7 +9,7 @@ async function find(
   const filePath = path.join(directoryPath, file);
   const stats = await fsPromises.stat(filePath);
   if (stats.isFile()) {
-    if (filePath.includes(".ts") || filePath.includes(".js")) {
+    if (filePath.includes(".ts") || filePath.includes(".js") || filePath.includes(".txt") || filePath.includes(".md")) {
       await callback(filePath)
     }
   } else if (stats.isDirectory()) {
