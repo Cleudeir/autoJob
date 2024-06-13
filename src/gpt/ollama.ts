@@ -1,5 +1,4 @@
 import { OLLAMA_URL } from "../../.env";
-import { extractCodeFromTripleBackticks } from "../utils/extractCodeFromTripleBackticks";
 
 const fetch = (...args: any[]) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
@@ -30,13 +29,22 @@ export const ollama = async ({
     },
   };
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      body: JSON.stringify(body),
-    });
+  const timeMax = (ms = 60 * 1 * 1000) =>
+    new Promise((resolve, reject) => {
+      return setTimeout(() => resolve({ json: () => Promise.resolve({ error: "timeout 60s" }) }), ms)
+    })
 
-    const result = await response.json();
+  try {
+    const response = await Promise.race([
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+      timeMax(),
+    ])
+
+
+    const result = await response?.json();
     if (result.error) {
       console.error("Error fetching response:", result.error);
       return undefined;

@@ -1,7 +1,6 @@
 const fetch = (...args: any[]) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 import { OPENAI_API_KEY } from "../../.env.js";
-import { extractCodeFromTripleBackticks } from "../utils/extractCodeFromTripleBackticks.js";
 
 type Props = {
   content: string;

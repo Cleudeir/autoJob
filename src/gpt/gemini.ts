@@ -1,5 +1,4 @@
 import { GEMINI_API_KEY } from '../../.env';
-import { extractCodeFromTripleBackticks } from '../utils/extractCodeFromTripleBackticks';
 
 type Props = {
   content: string;
